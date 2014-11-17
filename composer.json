@@ -1,0 +1,21 @@
+{
+	"name": "swipestripe/swipestripe-weightbasedshipping",
+	"description": "Weight based shipping support in SwipeStripe",
+	"homepage": "https://github.com/swipestripe/silverstripe-swipestripe-flatfeeshipping",
+	"license": "BSD-3-Clause",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "ecommerce", "e-commerce", "shop", "swipestripe", "swipe stripe", "shipping", "weight", "weight-based"],
+	"authors": [
+		{
+			"name": "Jarrad Salmon",
+			"email": "jbardnz@gmail.com"
+		}
+	],
+	"require":
+	{
+		"silverstripe/framework": "~3.1",
+		"silverstripe/cms": "~3.1",
+		"swipestripe/swipestripe": "2.1.*",
+		"swipestripe/swipestripe-addresses": "2.1.*"
+	}
+}
