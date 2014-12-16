@@ -1,7 +1,9 @@
 ---
 name: SwipeStripe Weight Based Shipping
 ---
-
+# ShopAdmin:
+#   extensions:
+#     - 'WeightBasedShippingConfig'
 ShopConfig:
   extensions: 
     - 'WeightBasedShippingRate_Extension'

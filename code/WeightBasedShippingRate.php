@@ -75,8 +75,13 @@ class WeightBasedShippingRate extends DataObject {
 	
 
 	public function Label() {
-		return $this->Description . ' - ' . $this->Price()->Nice();
+        $providerName = $this->Provider()->Name;
+		return $providerName . ' - ' . $this->Price()->Nice();
 	}
+
+    public function Description() {
+        return $this->Provider()->Name;
+    }
 	
 	/**
 	 * Summary of the current tax rate
@@ -148,7 +153,8 @@ class WeightBasedShippingRate_Admin extends ShopAdmin {
 	private static $allowed_actions = array(
 		'WeightBasedShippingSettings',
 		'WeightBasedShippingSettingsForm',
-		'saveWeightBasedShippingSettings'
+		'saveWeightBasedShippingSettings',
+		'WeightBasedShippingConfig'
 	);
 
 	private static $url_rule = 'ShopConfig/WeightBasedShipping';
@@ -159,6 +165,7 @@ class WeightBasedShippingRate_Admin extends ShopAdmin {
 		'ShopConfig/WeightBasedShipping/WeightBasedShippingSettingsForm' => 'WeightBasedShippingSettingsForm',
 		'ShopConfig/WeightBasedShipping' => 'WeightBasedShippingSettings'
 	);
+
 
 	public function init() {
 		parent::init();
@@ -293,6 +300,8 @@ class WeightBasedShippingRate_Admin extends ShopAdmin {
 			'Title' => 'Weight Based Shipping Management',
 			'Help' => 'Create weight based shipping rates',
 			'Link' => Controller::join_links($this->Link('ShopConfig'), 'WeightBasedShipping'),
+			//Hi-jacking this to send to new UI admin
+			//'Link' => Controller::join_links($this->Link('ShopConfig'), 'WeightBasedShippingConfig'),
 			'LinkTitle' => 'Edit weight based shipping rates'
 		))->renderWith('ShopAdmin_Snippet');
 	}
