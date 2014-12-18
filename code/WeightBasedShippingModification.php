@@ -13,7 +13,6 @@ class WeightBasedShippingModification extends Modification {
 	private static $default_sort = 'SortOrder ASC';
 
 	public function add($order, $value = null) {
-
         $rates = null;
 		$this->OrderID = $order->ID;
 
@@ -43,7 +42,6 @@ class WeightBasedShippingModification extends Modification {
 	}
 
     public function getWeightOfOrder($order){
-
         $items = $order->Items();
         $weight = 0;
         foreach($items as $item){
@@ -55,41 +53,55 @@ class WeightBasedShippingModification extends Modification {
 
 	public function getWeightShippingRates($regionCode = null, $weight = 0) {
 		//Get valid rates for this region
-
-        if($regionCode){
+		if($regionCode){
+			$filter = array();
+			
             $region = Region_Shipping::get()->filter('Code', $regionCode)->first();
+			if($region && $region->exists()){
+				$filter[	'RegionID'] = $region->ID;
+			}
+			
             $ranges = WeightBasedShippingRange::get()->where($weight . " <= RangeEnd AND " . $weight . " >= RangeStart");
-
-            $rates = WeightBasedShippingRate::get()->filter(array('RegionID' => $region->ID, 'RangeID' => $ranges->column('ID')));
-
-        }else{
-            $rates = WeightBasedShippingRate::get();
+			if($ranges){
+				$filter['RangeID'] = $ranges->column('ID');
+			}
+			
+            $ratesList = WeightBasedShippingRate::get()->filter($filter);
+        } else {
+            $ratesList = WeightBasedShippingRate::get();
         }
-
-		$this->extend("updateWeightShippingRates", $rates);
+		
+		$rates = new ArrayList();		
+		if($ratesList){
+			foreach($ratesList as $rate){
+				$rate->Label = $rate->Label();	
+				$rates->push($rate);
+			}
+		}
+		
+		$this->extend("updateWeightShippingRates", $rates, $regionCode);
+		
 		return $rates;
 	}
 
 	public function getFormFields() {
-
 		$fields = new FieldList();
 
 		$rate = $this->WeightBasedShippingRate();
 
-        //get region code if possible
-        $regionCode = Region_Shipping::get()->filter('ID', $rate->RegionID)->first()->Code;
+        // Get region code if possible
+        $regionCode = Session::get('ShippingAddressID') ? DataObject::get_by_id('Address_Shipping', Session::get('ShippingAddressID'))->RegionCode : null;
 		$rates = $this->getWeightShippingRates($regionCode);
-
+		
 		if ($rates && $rates->exists()) {
-
-			if ($rates->count() > 1) {
+			$ratesArray = $rates->map('ID', 'Label');
+			if (count($ratesArray) > 1) {
 				$field = WeightBasedShippingModifierField_Multiple::create(
 					$this,
 					'Shipping',
-					$rates->map('ID', 'Label')->toArray()
+					$ratesArray
 				)->setValue($rate->ID);
-			}
-			else {
+			} else {
 				$newRate = $rates->first();
 				$field = WeightBasedShippingModifierField::create(
 					$this,
@@ -97,24 +109,15 @@ class WeightBasedShippingModification extends Modification {
 					$newRate->ID
 				)->setAmount($newRate->Price());
 			}
-
+			
 			$fields->push($field);
 		}
+				
+		$this->extend("updateWeightShippingRatesForm", $fields, $rate);
 
-
-
-        //if instore pickup is installed add a hard coded item
-        if(class_exists('InstorePickup')){
-            $instorePickup = InstorePickup::get()->filter(array('CountryID' => $rate->CountryID));
-
-            if(count($instorePickup)){
-                $instoreField = HiddenField::create('hasInstorePickup');
-                $fields->push($instoreField);
-            }
-        }
-
-
-		if (!$fields->exists()) Requirements::javascript('swipestripe-weightbasedshipping/javascript/WeightBasedShippingModifierField.js');
+		if(!$fields->exists()){
+			Requirements::javascript('swipestripe-weightbasedshipping/javascript/WeightBasedShippingModifierField.js');
+		}
 
 		return $fields;
 	}

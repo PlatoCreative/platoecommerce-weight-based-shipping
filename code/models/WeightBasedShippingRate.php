@@ -31,48 +31,40 @@ class WeightBasedShippingRate extends DataObject {
 		'Region.Title' => 'Region'
 	);
 
-    public function providePermissions()
-    {
+    public function providePermissions(){
         return array(
             'EDIT_WEIGHTBASEDSHIPPING' => 'Edit Weight Based Shipping',
         );
     }
 
-    public function canEdit($member = null)
-    {
+    public function canEdit($member = null){
         return Permission::check('EDIT_WEIGHTBASEDSHIPPING');
     }
 
-    public function canView($member = null)
-    {
+    public function canView($member = null){
         return true;
     }
 
-    public function canDelete($member = null)
-    {
+    public function canDelete($member = null){
         return Permission::check('EDIT_WEIGHTBASEDSHIPPING');
     }
 
-    public function canCreate($member = null)
-    {
+    public function canCreate($member = null){
         return Permission::check('EDIT_WEIGHTBASEDSHIPPING');
-    }
-	
+    }	
 
 	public function getCMSFields() {
-
 		return new FieldList(
 			$rootTab = new TabSet('Root',
 				$tabMain = new Tab('ShippingRate',
-					DropdownField::create('RangeID', 'Range', WeightBasedShippingRange::get()->map('ID', 'Label')->toArray()),
-					DropdownField::create('ProviderID', 'Provider', WeightBasedShippingProvider::get()->map()->toArray()),
-					DropdownField::create('RegionID', 'Region', Region_Shipping::get()->map()->toArray()),
+					DropdownField::create('RangeID', 'Range', WeightBasedShippingRange::get()->filter(array('ShopConfigID' => $shopConfig->ID))->map('ID', 'Label')->toArray()),
+					DropdownField::create('ProviderID', 'Provider', WeightBasedShippingProvider::get()->filter(array('ShopConfigID' => $shopConfig->ID))->map()->toArray()),
+					DropdownField::create('RegionID', 'Region', Region_Shipping::get()->filter(array('ShopConfigID' => $shopConfig->ID))->map()->toArray()),
 					PriceField::create('Price')
 				)
 			)
 		);
-	}
-	
+	}	
 
 	public function Label() {
         $providerName = $this->Provider()->Name;
@@ -93,9 +85,7 @@ class WeightBasedShippingRate extends DataObject {
 	}
 
 	public function Amount() {
-
 		// TODO: Multi currency
-
 		$shopConfig = ShopConfig::current_shop_config();
 
 		$amount = new Price();
@@ -117,8 +107,13 @@ class WeightBasedShippingRate extends DataObject {
 		return $amount;
 	}
 	
+	public function onBeforeWrite(){
+		parent::onBeforeWrite();
+		$shopConfig = ShopConfig::current_shop_config();
+		
+		$this->ShopConfigID = $shopConfig->ID;
+	}	
 }
-
 
 class WeightBasedShippingRate_Extension extends DataExtension {
 
@@ -130,11 +125,9 @@ class WeightBasedShippingRate_Extension extends DataExtension {
 	private static $has_many = array(
 		'WeightBasedShippingRates' => 'WeightBasedShippingRate'
 	);
-
 }
 
 class ProductWeight_Extension extends DataExtension {
-
 	private static $db = array(
 		'Weight' => 'Int'
 	);
@@ -142,8 +135,6 @@ class ProductWeight_Extension extends DataExtension {
 	public function updateProductCMSFields(&$fields) {
 		$fields->addFieldToTab('Root.Main', NumericField::create('Weight', 'Weight (in grams)'), 'Content');
 	}
-
-
 }
 
 class WeightBasedShippingRate_Admin extends ShopAdmin {
@@ -165,7 +156,6 @@ class WeightBasedShippingRate_Admin extends ShopAdmin {
 		'ShopConfig/WeightBasedShipping/WeightBasedShippingSettingsForm' => 'WeightBasedShippingSettingsForm',
 		'ShopConfig/WeightBasedShipping' => 'WeightBasedShippingSettings'
 	);
-
 
 	public function init() {
 		parent::init();
@@ -305,5 +295,4 @@ class WeightBasedShippingRate_Admin extends ShopAdmin {
 			'LinkTitle' => 'Edit weight based shipping rates'
 		))->renderWith('ShopAdmin_Snippet');
 	}
-
 }
