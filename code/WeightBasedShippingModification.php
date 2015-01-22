@@ -12,7 +12,8 @@ class WeightBasedShippingModification extends Modification {
 
 	private static $default_sort = 'SortOrder ASC';
 
-	public function add($order, $value = null) {
+	public function add($order, $value = null){
+		$data = $_POST ? $_POST : null;
         $rates = null;
 		$this->OrderID = $order->ID;
 
@@ -20,7 +21,6 @@ class WeightBasedShippingModification extends Modification {
 
 		$rates = $this->getWeightShippingRates($order->ShippingRegionCode, $weight);
 		if ($rates && $rates->exists()) {
-
 			//Pick the rate
 			$rate = $rates->find('ID', $value);
 
@@ -30,13 +30,15 @@ class WeightBasedShippingModification extends Modification {
 
 			//Generate the Modification now that we have picked the correct rate
 			$mod = new WeightBasedShippingModification();
-
 			$mod->Price = $rate->Amount()->getAmount();
-
 			$mod->Description = $rate->Description();
 			$mod->OrderID = $order->ID;
 			$mod->Value = $rate->ID;
 			$mod->WeightBasedShippingRateID = $rate->ID;
+			$mod->write();
+			
+			$this->extend("updateWeightShippingAdd", $rate, $mod, $data);
+			
 			$mod->write();
 		}
 	}
@@ -68,7 +70,7 @@ class WeightBasedShippingModification extends Modification {
 			
             $ratesList = WeightBasedShippingRate::get()->filter($filter);
         } else {
-            $ratesList = WeightBasedShippingRate::get();
+            $ratesList = null;//WeightBasedShippingRate::get();
         }
 		
 		$rates = new ArrayList();		
@@ -86,21 +88,21 @@ class WeightBasedShippingModification extends Modification {
 
 	public function getFormFields() {
 		$fields = new FieldList();
-
 		$rate = $this->WeightBasedShippingRate();
 
         // Get region code if possible
         $regionCode = Session::get('ShippingAddressID') ? DataObject::get_by_id('Address_Shipping', Session::get('ShippingAddressID'))->RegionCode : null;
 		$rates = $this->getWeightShippingRates($regionCode);
 		
-		if ($rates && $rates->exists()) {
+		if($rates && $rates->exists()) {
 			$ratesArray = $rates->map('ID', 'Label');
-			if (count($ratesArray) > 1) {
+			//if(count($ratesArray) > 1) {
 				$field = WeightBasedShippingModifierField_Multiple::create(
 					$this,
 					'Shipping',
 					$ratesArray
 				)->setValue($rate->ID);
+			/*
 			} else {
 				$newRate = $rates->first();
 				$field = WeightBasedShippingModifierField::create(
@@ -109,6 +111,7 @@ class WeightBasedShippingModification extends Modification {
 					$newRate->ID
 				)->setAmount($newRate->Price());
 			}
+			*/
 			
 			$fields->push($field);
 		}

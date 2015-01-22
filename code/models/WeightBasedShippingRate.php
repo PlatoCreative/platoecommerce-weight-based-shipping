@@ -54,6 +54,7 @@ class WeightBasedShippingRate extends DataObject {
     }	
 
 	public function getCMSFields() {
+		$shopConfig = ShopConfig::current_shop_config();
 		return new FieldList(
 			$rootTab = new TabSet('Root',
 				$tabMain = new Tab('ShippingRate',
