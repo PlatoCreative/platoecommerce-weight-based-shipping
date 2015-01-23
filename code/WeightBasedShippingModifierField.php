@@ -51,6 +51,12 @@ class WeightBasedShippingModifierField extends ModificationField_Hidden {
 
 class WeightBasedShippingModifierField_Multiple extends ModificationField_Dropdown {
 	
+	public function init(){
+		die('up to unt');
+		Parent::init();
+		$this->renderWith('WeightBasedShippingModifierField_Multiple');
+	}
+	
 	/**
 	 * The amount this field represents e.g: 15% * order subtotal
 	 * 
