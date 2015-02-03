@@ -52,7 +52,6 @@ class WeightBasedShippingModifierField extends ModificationField_Hidden {
 class WeightBasedShippingModifierField_Multiple extends ModificationField_Dropdown {
 	
 	public function init(){
-		die('up to unt');
 		Parent::init();
 		$this->renderWith('WeightBasedShippingModifierField_Multiple');
 	}

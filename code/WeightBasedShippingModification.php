@@ -93,10 +93,10 @@ class WeightBasedShippingModification extends Modification {
         // Get region code if possible
         $regionCode = Session::get('ShippingAddressID') ? DataObject::get_by_id('Address_Shipping', Session::get('ShippingAddressID'))->RegionCode : null;
 		$rates = $this->getWeightShippingRates($regionCode);
-		
+
 		if($rates && $rates->exists()) {
 			$ratesArray = $rates->map('ID', 'Label');
-			//if(count($ratesArray) > 1) {
+			//if(count($ratesArray) > 1){
 				$field = WeightBasedShippingModifierField_Multiple::create(
 					$this,
 					'Shipping',
@@ -112,12 +112,11 @@ class WeightBasedShippingModification extends Modification {
 				)->setAmount($newRate->Price());
 			}
 			*/
-			
 			$fields->push($field);
 		}
-				
+			
 		$this->extend("updateWeightShippingRatesForm", $fields, $rate);
-
+		
 		if(!$fields->exists()){
 			Requirements::javascript('swipestripe-weightbasedshipping/javascript/WeightBasedShippingModifierField.js');
 		}
