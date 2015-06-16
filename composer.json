@@ -11,11 +11,21 @@
 			"email": "jbardnz@gmail.com"
 		}
 	],
+	"repositories": [
+	        {
+	            "type": "vcs",
+	            "url": "git@github.com:PlatoCreative/silverstripe-swipestripe.git"
+	        },
+		{
+	            "type": "vcs",
+	            "url": "https://github.com/PlatoCreative/silverstripe-swipestripe-addresses"
+		}
+	    ],
 	"require":
 	{
 		"silverstripe/framework": "~3.1",
 		"silverstripe/cms": "~3.1",
-		"swipestripe/swipestripe": "2.1.*",
-		"swipestripe/swipestripe-addresses": "2.1.*"
+		"swipestripe/swipestripe": "dev-master as 2.1.*-dev",
+		"swipestripe/swipestripe-addresses": "dev-master as 2.1.*-dev"
 	}
 }
