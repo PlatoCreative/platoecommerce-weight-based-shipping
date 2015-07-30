@@ -43,8 +43,8 @@ class WeightBasedShippingRange extends DataObject {
 		return new FieldList(
 			$rootTab = new TabSet('Root',
 				$tabMain = new Tab('WeightRanges',
-					NumericField::create('RangeStart', 'Range Start (kgs)'),
-					NumericField::create('RangeEnd', 'Range End (kgs)')
+					TextField::create('RangeStart', 'Range Start (kgs)'),
+					TextField::create('RangeEnd', 'Range End (kgs)')
 				)
 			)
 		);
