@@ -3,8 +3,8 @@ class WeightBasedShippingRange extends DataObject {
 
 
 	private static $db = array(
-		'RangeStart' => 'Int',
-		'RangeEnd' => 'Int'
+		'RangeStart' => 'Decimal(8,4)',
+		'RangeEnd' => 'Decimal(8,4)'
 	);
 
 	private static $has_one = array(
@@ -43,8 +43,8 @@ class WeightBasedShippingRange extends DataObject {
 		return new FieldList(
 			$rootTab = new TabSet('Root',
 				$tabMain = new Tab('WeightRanges',
-					NumericField::create('RangeStart', 'Range Start (grams)'),
-					NumericField::create('RangeEnd', 'Range End (grams)')
+					NumericField::create('RangeStart', 'Range Start (kgs)'),
+					NumericField::create('RangeEnd', 'Range End (kgs)')
 				)
 			)
 		);

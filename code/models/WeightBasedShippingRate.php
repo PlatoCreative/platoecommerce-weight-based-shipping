@@ -130,11 +130,11 @@ class WeightBasedShippingRate_Extension extends DataExtension {
 
 class ProductWeight_Extension extends DataExtension {
 	private static $db = array(
-		'Weight' => 'Int'
+		'Weight' => 'Decimal(8,4)'
 	);
 
 	public function updateProductCMSFields(&$fields) {
-		$fields->addFieldToTab('Root.Main', NumericField::create('Weight', 'Weight (in grams)'), 'Content');
+		$fields->addFieldToTab('Root.Main', TextField::create('Weight', 'Weight (kgs)'), 'Content');
 	}
 }
 

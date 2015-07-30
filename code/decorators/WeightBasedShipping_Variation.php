@@ -4,7 +4,7 @@
 */
 class WeightBasedShipping_Variation extends DataExtension {
 	public static $db = array(
-		'Weight' => 'Int'
+		'Weight' => 'Decimal(8,4)'
 	);
 
 	public static $has_one = array(
@@ -15,7 +15,7 @@ class WeightBasedShipping_Variation extends DataExtension {
 
 	public function updateCMSFields(FieldList $fields) {
 		$fields->addFieldsToTab('Root.Variation', array(
-			TextField::create('Weight', 'Weight (grams)')
+			TextField::create('Weight', 'Weight (kgs)')
 		), 'Status');
 
 		return $fields;

@@ -17,7 +17,6 @@ Product:
     - 'ProductWeight_Extension'
 Variation:
   extensions:
-    - 'ProductWeight_Extension'
     - 'WeightBasedShipping_Variation'
 Item:
   extensions:
