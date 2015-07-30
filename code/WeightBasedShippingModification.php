@@ -72,7 +72,7 @@ class WeightBasedShippingModification extends Modification {
 			}
 
 			// Get the weight ranges
-			if($weight == 0){
+			if($weight <= 0){
 				$weight = $this->getWeightOfOrder($order);
 			}
 
