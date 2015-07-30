@@ -1,11 +1,9 @@
 <?php
 class WeightBasedShippingProvider extends DataObject {
-	
 
 	private static $db = array(
 		'Name' => 'Text'
 	);
-
 
 	private static $has_one = array(
 		'ShopConfig' => 'ShopConfig',
@@ -17,36 +15,30 @@ class WeightBasedShippingProvider extends DataObject {
 		'Country.Title' => 'Country'
 	);
 
-    public function providePermissions()
-    {
+    public function providePermissions(){
         return array(
             'EDIT_WEIGHTBASEDSHIPPINGPROVIDER' => 'Edit Shipping Providers',
         );
     }
 
-    public function canEdit($member = null)
-    {
+    public function canEdit($member = null){
         return Permission::check('EDIT_WEIGHTBASEDSHIPPINGPROVIDER');
     }
 
-    public function canView($member = null)
-    {
+    public function canView($member = null){
         return true;
     }
 
-    public function canDelete($member = null)
-    {
+    public function canDelete($member = null){
         return Permission::check('EDIT_WEIGHTBASEDSHIPPINGPROVIDER');
     }
 
-    public function canCreate($member = null)
-    {
+    public function canCreate($member = null){
         return Permission::check('EDIT_WEIGHTBASEDSHIPPINGPROVIDER');
     }
-	
+
 
 	public function getCMSFields() {
-
 		return new FieldList(
 			$rootTab = new TabSet('Root',
 				$tabMain = new Tab('Shipping Providers',
@@ -64,7 +56,7 @@ class WeightBasedShippingProvider_Extension extends DataExtension {
 
 	/**
 	 * Attach {@link WeightBasedShippingProvider}s to {@link SiteConfig}.
-	 * 
+	 *
 	 * @see DataObjectDecorator::extraStatics()
 	 */
 	private static $has_many = array(
@@ -77,7 +69,7 @@ class WeightBasedShippingProvider_Extension extends DataExtension {
 class WeightBasedShippingProvider_Admin extends ShopAdmin {
 
 	private static $tree_class = 'ShopConfig';
-	
+
 	private static $allowed_actions = array(
 		'WeightBasedShippingProviderSettings',
 		'WeightBasedShippingProviderSettingsForm',
@@ -118,7 +110,6 @@ class WeightBasedShippingProvider_Admin extends ShopAdmin {
 	}
 
 	public function WeightBasedShippingProviderSettings($request) {
-
 		if ($request->isAjax()) {
 			$controller = $this;
 			$responseNegotiator = new PjaxResponseNegotiator(
@@ -137,7 +128,7 @@ class WeightBasedShippingProvider_Admin extends ShopAdmin {
 					}
 				),
 				$this->response
-			); 
+			);
 			return $responseNegotiator->respond($this->getRequest());
 		}
 
@@ -145,7 +136,6 @@ class WeightBasedShippingProvider_Admin extends ShopAdmin {
 	}
 
 	public function WeightBasedShippingProviderSettingsForm() {
-
 		$shopConfig = ShopConfig::get()->First();
 
 		$fields = new FieldList(
@@ -186,7 +176,6 @@ class WeightBasedShippingProvider_Admin extends ShopAdmin {
 	}
 
 	public function saveWeightBasedShippingProviderSettings($data, $form) {
-
 		//Hack for LeftAndMain::getRecord()
 		self::$tree_class = 'ShopConfig';
 
@@ -213,7 +202,7 @@ class WeightBasedShippingProvider_Admin extends ShopAdmin {
 				}
 			),
 			$this->response
-		); 
+		);
 		return $responseNegotiator->respond($this->getRequest());
 	}
 

@@ -1,10 +1,10 @@
 <?php
-class WeightBasedShippingRange extends DataObject {
+class WeightBasedShippingPriceRange extends DataObject {
 
 
 	private static $db = array(
-		'RangeStart' => 'Int',
-		'RangeEnd' => 'Int'
+		'RangeStart' => 'Decimal(18,2)',
+		'RangeEnd' => 'Decimal(18,2)'
 	);
 
 	private static $has_one = array(
@@ -18,12 +18,12 @@ class WeightBasedShippingRange extends DataObject {
 
     public function providePermissions(){
         return array(
-            'EDIT_WEIGHTBASEDSHIPPINGRANGE' => 'Edit Weight Ranges',
+            'EDIT_WEIGHTBASEDSHIPPINGPRICERANGE' => 'Edit Price Ranges',
         );
     }
 
     public function canEdit($member = null){
-        return Permission::check('EDIT_WEIGHTBASEDSHIPPINGRANGE');
+        return Permission::check('EDIT_WEIGHTBASEDSHIPPINGPRICERANGE');
     }
 
     public function canView($member = null){
@@ -31,55 +31,65 @@ class WeightBasedShippingRange extends DataObject {
     }
 
     public function canDelete($member = null){
-        return Permission::check('EDIT_WEIGHTBASEDSHIPPINGRANGE');
+        return Permission::check('EDIT_WEIGHTBASEDSHIPPINGPRICERANGE');
     }
 
     public function canCreate($member = null){
-        return Permission::check('EDIT_WEIGHTBASEDSHIPPINGRANGE');
+        return Permission::check('EDIT_WEIGHTBASEDSHIPPINGPRICERANGE');
     }
 
 
 	public function getCMSFields() {
 		return new FieldList(
 			$rootTab = new TabSet('Root',
-				$tabMain = new Tab('WeightRanges',
-					NumericField::create('RangeStart', 'Range Start (grams)'),
-					NumericField::create('RangeEnd', 'Range End (grams)')
+				$tabMain = new Tab('PriceRanges',
+					NumericField::create('RangeStart', 'Range Start (dollars)'),
+					NumericField::create('RangeEnd', 'Range End (dollars)')
 				)
 			)
 		);
 	}
 
 	public function Label() {
-		return $this->RangeStart . ' - ' . $this->RangeEnd;
+		$siteconfig = SiteConfig::current_site_config();
+		$shopConfig = ShopConfig::current_shop_config();
+
+		if($siteconfig->Config()->UsePriceRanges){
+			$symbol = $shopConfig->BaseCurrencySymbol;
+			return $symbol. $this->RangeStart . ' - ' . $symbol . $this->RangeEnd;
+		}
+
+		return '';
 	}
 }
 
+/*
+*	WeightBasedShippingPriceRange_Extension extends ShopConfig
+*/
 
-class WeightBasedShippingRange_Extension extends DataExtension {
+class WeightBasedShippingPriceRange_Extension extends DataExtension {
 	private static $has_many = array(
-		'WeightBasedShippingRanges' => 'WeightBasedShippingRange'
+		'WeightBasedShippingPriceRanges' => 'WeightBasedShippingPriceRange'
 	);
 }
 
 
-class WeightBasedShippingRange_Admin extends ShopAdmin {
-
+class WeightBasedShippingPriceRange_Admin extends ShopAdmin {
 	private static $tree_class = 'ShopConfig';
 
 	private static $allowed_actions = array(
-		'WeightBasedRangeSettings',
-		'WeightBasedRangeSettingsForm',
-		'saveWeightBasedRangeSettings'
+		'WeightBasedPriceRangeSettings',
+		'WeightBasedPriceRangeSettingsForm',
+		'saveWeightBasedPriceRangeSettings'
 	);
 
-	private static $url_rule = 'ShopConfig/WeightBasedRanges';
+	private static $url_rule = 'ShopConfig/WeightBasedPriceRanges';
 	protected static $url_priority = 110;
 	private static $menu_title = 'Shop Weight Ranges';
 
 	private static $url_handlers = array(
-		'ShopConfig/WeightBasedRanges/WeightBasedRangeSettingsForm' => 'WeightBasedRangeSettingsForm',
-		'ShopConfig/WeightBasedRanges' => 'WeightBasedRangeSettings'
+		'ShopConfig/WeightBasedPriceRanges/WeightBasedPriceRangeSettingsForm' => 'WeightBasedPriceRangeSettingsForm',
+		'ShopConfig/WeightBasedPriceRanges' => 'WeightBasedPriceRangeSettings'
 	);
 
 	public function init() {
@@ -88,32 +98,34 @@ class WeightBasedShippingRange_Admin extends ShopAdmin {
 	}
 
 	public function Breadcrumbs($unlinked = false) {
-
+		$siteconfig = SiteConfig::current_site_config();
+		$shopConfig = ShopConfig::current_shop_config();
 		$request = $this->getRequest();
 		$items = parent::Breadcrumbs($unlinked);
 
 		if ($items->count() > 1) $items->remove($items->pop());
 
-		$items->push(new ArrayData(array(
-			'Title' => 'Weight Ranges',
-			'Link' => $this->Link(Controller::join_links($this->sanitiseClassName($this->modelClass), 'WeightBasedRanges'))
-		)));
+		if($siteconfig->Config()->UsePriceRanges){
+			$items->push(new ArrayData(array(
+				'Title' => 'Price Ranges',
+				'Link' => $this->Link(Controller::join_links($this->sanitiseClassName($this->modelClass), 'WeightBasedPriceRanges'))
+			)));
+		}
 
 		return $items;
 	}
 
 	public function SettingsForm($request = null) {
-		return $this->WeightBasedRangeSettingsForm();
+		return $this->WeightBasedPriceRangeSettingsForm();
 	}
 
-	public function WeightBasedRangeSettings($request) {
-
+	public function WeightBasedPriceRangeSettings($request) {
 		if ($request->isAjax()) {
 			$controller = $this;
 			$responseNegotiator = new PjaxResponseNegotiator(
 				array(
 					'CurrentForm' => function() use(&$controller) {
-						return $controller->WeightBasedRangeSettingsForm()->forTemplate();
+						return $controller->WeightBasedPriceRangeSettingsForm()->forTemplate();
 					},
 					'Content' => function() use(&$controller) {
 						return $controller->renderWith('ShopAdminSettings_Content');
@@ -133,17 +145,16 @@ class WeightBasedShippingRange_Admin extends ShopAdmin {
 		return $this->renderWith('ShopAdminSettings');
 	}
 
-	public function WeightBasedRangeSettingsForm() {
-
+	public function WeightBasedPriceRangeSettingsForm() {
 		$shopConfig = ShopConfig::get()->First();
 
 		$fields = new FieldList(
 			$rootTab = new TabSet('Root',
 				$tabMain = new Tab('Shipping',
 					GridField::create(
-						'WeightBasedShippingRanges',
-						'Weight Ranges',
-						$shopConfig->WeightBasedShippingRanges(),
+						'WeightBasedShippingPriceRanges',
+						'Price Ranges',
+						$shopConfig->WeightBasedShippingPriceRanges(),
 						GridFieldConfig_HasManyRelationEditor::create()
 					)
 				)
@@ -167,29 +178,28 @@ class WeightBasedShippingRange_Admin extends ShopAdmin {
 		$form->setAttribute('data-pjax-fragment', 'CurrentForm');
 		$form->addExtraClass('cms-content cms-edit-form center ss-tabset');
 		if($form->Fields()->hasTabset()) $form->Fields()->findOrMakeTab('Root')->setTemplate('CMSTabSet');
-		$form->setFormAction(Controller::join_links($this->Link($this->sanitiseClassName($this->modelClass)), 'WeightBasedRanges/WeightBasedRangeSettingsForm'));
+		$form->setFormAction(Controller::join_links($this->Link($this->sanitiseClassName($this->modelClass)), 'WeightBasedPriceRanges/WeightBasedPriceRangeSettingsForm'));
 
 		$form->loadDataFrom($shopConfig);
 
 		return $form;
 	}
 
-	public function saveWeightBasedRangeSettings($data, $form) {
-
+	public function saveWeightBasedPriceRangeSettings($data, $form) {
 		//Hack for LeftAndMain::getRecord()
 		self::$tree_class = 'ShopConfig';
 
-		$config = ShopConfig::get()->First();
+		$config = ShopConfig::current_shop_config();
 		$form->saveInto($config);
 		$config->write();
-		$form->sessionMessage('Saved Weight Ranges', 'good');
+		$form->sessionMessage('Saved Price Ranges', 'good');
 
 		$controller = $this;
 		$responseNegotiator = new PjaxResponseNegotiator(
 			array(
 				'CurrentForm' => function() use(&$controller) {
 					//return $controller->renderWith('ShopAdminSettings_Content');
-					return $controller->WeightBasedRangeSettingsForm()->forTemplate();
+					return $controller->WeightBasedPriceRangeSettingsForm()->forTemplate();
 				},
 				'Content' => function() use(&$controller) {
 					//return $controller->renderWith($controller->getTemplatesWithSuffix('_Content'));
@@ -207,16 +217,26 @@ class WeightBasedShippingRange_Admin extends ShopAdmin {
 	}
 
 	public function getSnippet() {
+		$shopConfig = ShopConfig::current_shop_config();
+		$siteconfig = SiteConfig::current_site_config();
 
-		if (!$member = Member::currentUser()) return false;
-		if (!Permission::check('CMS_ACCESS_' . get_class($this), 'any', $member)) return false;
+		if (!$member = Member::currentUser()){
+			return false;
+		}
 
-		return $this->customise(array(
-			'Title' => 'Weight Ranges Management',
-			'Help' => 'Create weight ranges',
-			'Link' => Controller::join_links($this->Link('ShopConfig'), 'WeightBasedRanges'),
-			'LinkTitle' => 'Edit weight ranges'
-		))->renderWith('ShopAdmin_Snippet');
+		if (!Permission::check('CMS_ACCESS_' . get_class($this), 'any', $member)){
+			return false;
+		}
+
+		if($siteconfig->Config()->UsePriceRanges){
+			return $this->customise(array(
+				'Title' => 'Price Ranges Management',
+				'Help' => 'Create price ranges',
+				'Link' => Controller::join_links($this->Link('ShopConfig'), 'WeightBasedPriceRanges'),
+				'LinkTitle' => 'Edit price ranges'
+			))->renderWith('ShopAdmin_Snippet');
+		}
+		return false;
 	}
 
 }

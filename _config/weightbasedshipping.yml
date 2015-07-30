@@ -5,16 +5,23 @@ name: SwipeStripe Weight Based Shipping
 #   extensions:
 #     - 'WeightBasedShippingConfig'
 ShopConfig:
-  extensions: 
+  extensions:
     - 'WeightBasedShippingRate_Extension'
     - 'WeightBasedShippingRange_Extension'
+    - 'WeightBasedShippingPriceRange_Extension'
     - 'WeightBasedShippingProvider_Extension'
+SiteConfig:
+  UsePriceRanges: false
 Product:
-  extensions: 
+  extensions:
     - 'ProductWeight_Extension'
 Variation:
-  extensions: 
+  extensions:
     - 'ProductWeight_Extension'
+    - 'WeightBasedShipping_Variation'
+Item:
+  extensions:
+    - 'WeightBasedShipping_Item'
 OrderForm:
-  extensions: 
+  extensions:
     - 'WeightBasedShippingModifierField_Extension'
