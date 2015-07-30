@@ -2,6 +2,7 @@
 class WeightBasedShippingProvider extends DataObject {
 
 	private static $db = array(
+		'Sort' => 'Int',
 		'Name' => 'Text'
 	);
 
@@ -14,6 +15,8 @@ class WeightBasedShippingProvider extends DataObject {
 		'Name' => 'Name',
 		'Country.Title' => 'Country'
 	);
+
+	static $default_sort = "Sort ASC";
 
     public function providePermissions(){
         return array(
@@ -138,6 +141,8 @@ class WeightBasedShippingProvider_Admin extends ShopAdmin {
 	public function WeightBasedShippingProviderSettingsForm() {
 		$shopConfig = ShopConfig::get()->First();
 
+		//GridFieldConfig_HasManyRelationEditor::create()
+		$providersConf = GridFieldConfig_RelationEditor::create(20)->addComponent(new GridFieldSortableRows('Sort'));
 		$fields = new FieldList(
 			$rootTab = new TabSet('Root',
 				$tabMain = new Tab('Shipping',
@@ -145,7 +150,7 @@ class WeightBasedShippingProvider_Admin extends ShopAdmin {
 						'WeightBasedShippingProviders',
 						'Shipping Providers',
 						$shopConfig->WeightBasedShippingProviders(),
-						GridFieldConfig_HasManyRelationEditor::create()
+						$providersConf
 					)
 				)
 			)
