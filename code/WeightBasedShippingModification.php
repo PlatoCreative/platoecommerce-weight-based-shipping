@@ -111,29 +111,22 @@ class WeightBasedShippingModification extends Modification {
 	public function getFormFields() {
 		$fields = new FieldList();
 		$rate = $this->WeightBasedShippingRate();
+		$customer = Customer::currentUser();
 
         // Get region code if possible
-        $regionCode = Session::get('ShippingAddressID') ? DataObject::get_by_id('Address_Shipping', Session::get('ShippingAddressID'))->RegionCode : null;
+		$defaultAddress = $customer ? $customer->DefaultShippingAddress() : false;
+        $regionCode = Session::get('ShippingAddressID') ? DataObject::get_by_id('Address_Shipping', Session::get('ShippingAddressID'))->RegionCode : ($defaultAddress ? $defaultAddress->RegionCode : null);
 		$rates = $this->getWeightShippingRates($regionCode);
 
 		if($rates && $rates->exists()) {
 			$ratesArray = $rates->map('ID', 'Label');
-			//if(count($ratesArray) > 1){
-				$field = WeightBasedShippingModifierField_Multiple::create(
-					$this,
-					'Shipping',
-					$ratesArray
-				)->setValue($rate->ID);
-			/*
-			} else {
-				$newRate = $rates->first();
-				$field = WeightBasedShippingModifierField::create(
-					$this,
-					'Shipping - ' . $newRate->Description(),
-					$newRate->ID
-				)->setAmount($newRate->Price());
-			}
-			*/
+
+			$field = WeightBasedShippingModifierField_Multiple::create(
+				$this,
+				'Shipping',
+				$ratesArray
+			)->setValue($rate->ID);
+
 			$fields->push($field);
 		}
 
