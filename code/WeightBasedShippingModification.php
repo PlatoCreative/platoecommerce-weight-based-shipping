@@ -7,7 +7,7 @@ class WeightBasedShippingModification extends Modification {
 
 	private static $defaults = array(
 		'SubTotalModifier' => true,
-		'SortOrder' => 100
+		'SortOrder' => 250
 	);
 
 	private static $default_sort = 'SortOrder ASC';
