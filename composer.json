@@ -17,5 +17,8 @@
 		"silverstripe/cms": "~3.1",
 		"plato-creative/platoecommerce": "3.1.*",
 		"plato-creative/platoecommerce-addresses": "3.1.*"
-	}
+	},
+	"extra": {
+		"installer-name": "plato-ecommerce-weight-based-shipping"
+	    }
 }
