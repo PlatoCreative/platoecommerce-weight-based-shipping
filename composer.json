@@ -1,5 +1,5 @@
 {
-	"name": "swipestripe/swipestripe-weightbasedshipping",
+	"name": "plato-creative/platoecommerce-weight-based-shipping",
 	"description": "Weight based shipping support in SwipeStripe",
 	"homepage": "https://github.com/swipestripe/silverstripe-swipestripe-flatfeeshipping",
 	"license": "BSD-3-Clause",
@@ -11,21 +11,11 @@
 			"email": "jbardnz@gmail.com"
 		}
 	],
-	"repositories": [
-	        {
-	            "type": "vcs",
-	            "url": "git@github.com:PlatoCreative/silverstripe-swipestripe.git"
-	        },
-		{
-	            "type": "vcs",
-	            "url": "https://github.com/PlatoCreative/silverstripe-swipestripe-addresses"
-		}
-	    ],
 	"require":
 	{
 		"silverstripe/framework": "~3.1",
 		"silverstripe/cms": "~3.1",
-		"swipestripe/swipestripe": "dev-master as 2.1.*-dev",
-		"swipestripe/swipestripe-addresses": "dev-master as 2.1.*-dev"
+		"plato-creative/platoecommerce": "3.1.*",
+		"plato-creative/platoecommerce-addresses": "3.1.*"
 	}
 }
