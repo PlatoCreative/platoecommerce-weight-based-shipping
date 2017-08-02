@@ -133,7 +133,7 @@ class WeightBasedShippingModification extends Modification {
 		$this->extend("updateWeightShippingRatesForm", $fields, $rate);
 
 		if(!$fields->exists()){
-			Requirements::javascript('swipestripe-weightbasedshipping/javascript/WeightBasedShippingModifierField.js');
+			Requirements::javascript('plato-ecommerce-weight-based-shipping/javascript/WeightBasedShippingModifierField.js');
 		}
 
 		return $fields;
