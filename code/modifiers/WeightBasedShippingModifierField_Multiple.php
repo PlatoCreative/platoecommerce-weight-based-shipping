@@ -22,7 +22,7 @@ class WeightBasedShippingModifierField_Multiple extends ModificationField_Dropdo
 	 */
 	public function FieldHolder($properties = array()) {
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-		Requirements::javascript('swipestripe-weightbasedshipping/javascript/WeightBasedShippingModifierField.js');
+		Requirements::javascript('plato-ecommerce-weight-based-shipping/javascript/WeightBasedShippingModifierField.js');
 		return $this->renderWith($this->template);
 	}
 
